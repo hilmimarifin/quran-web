@@ -1,12 +1,11 @@
-export const getBookmarks = async () => {
+export const deleteBookmark = async (id) => {
     const supabase = useSupabaseClient()
-    const currentUser = await getCurrentUser()
     
     try {
         let { data, error } = await supabase
             .from('bookmarks')
-            .select("*")
-            .eq('user_id', currentUser.id)
+            .delete()
+            .eq('id', id)
         if (error) throw error
 
         return {data}

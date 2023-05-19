@@ -1,29 +1,10 @@
 <template>
-    <div class="max-w-screen-md m-auto">
-        <div class="modal" :class="{ 'modal-open': showModal }">
-            <div class="modal-box">
-                <label for="my-modal-3" class="btn btn-sm btn-circle absolute right-2 top-2" @click="toggleModal">✕</label>
-                <form class="space-y-6" @submit.prevent="addBookmark">
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">
-                            Name
-                        </label>
-                        <div class="mt-1">
-                            <input v-model="name" id="name" name="name" type="text" required
-                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-                        </div>
-                    </div>
-
-                    <div class="modal-action">
-                        <button type="submit" class="btn">
-                            Tambah
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+    <div class="max-w-screen-md m-auto p-3">
+        <Head>
+            <title>{{ title }}</title>
+        </Head>
         <div class=" flex flex-col ">
-            <div class="navbar bg-base-100 fixed top-0 max-w-screen-md z-10">
+            <div class="navbar bg-base-100 max-w-screen-md z-10 border-b-4 fixed top-0 left-1/2 -translate-x-1/2">
                 <div class="navbar-start">
                     <div class="dropdown">
                         <label tabindex="0" class="btn btn-ghost btn-circle">
@@ -34,17 +15,26 @@
                             </svg>
                         </label>
                         <ul tabindex="0"
-                            class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-                            <li @click="toggleModal"><a>Add bookmark</a></li>
-                            <li v-for="bookmark in bookmarks" :key="bookmark.id"
+                            class="menu menu-compact dropdown-content mt-3  shadow bg-base-100 rounded-box w-52">
+                            <li v-for="bookmark in bookmarks2" :key="bookmark.id"
                                 @click="handleClickBookmark(bookmark.surat, bookmark.ayat)">
-                                <a>{{ bookmark.name }}</a>
+                                <a>
+                                    <div class="flex flex-row justify-between w-full">
+                                        <span>{{ bookmark.name }}</span>
+                                        <span class=" text-xs italic my-auto">{{ bookmark.suratName }}:{{ bookmark.ayat }}</span>
+                                    </div>
+                                </a>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <div class="navbar-center">
-                    <a @click="handleClickHome" class="btn btn-ghost normal-case text-xl">{{ title }}</a>
+                    <a @click="handleClickHome" class="btn btn-ghost">
+                        <div class="flex flex-col">
+                            <div class=" normal-case text-xl"><h1>{{ title }}</h1></div>
+                            <div class=" normal-case text-xs"><p>{{ subtitle }}</p></div>
+                        </div>
+                    </a>
                 </div>
                 <div class="navbar-end">
                     <div class="dropdown dropdown-end">
@@ -62,12 +52,13 @@
                                 </a>
                             </li>
                             <li><a>Settings</a></li>
+                            <li @click="handleBookmark"><a>Manage Bookmarks</a></li>
                             <li @click="handleLogout"><a>Logout</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
-            <div class="card card-side bg-base-100 shadow-lg min-h-screen mt-16">
+            <div class="card card-side bg-base-100 shadow-lg mt-16">
                 <div class="card-body">
                     <slot />
                 </div>
@@ -78,43 +69,38 @@
 
 <script setup>
 const supabase = useSupabaseClient()
-const showModal = ref(false);
-const name = ref('')
 const isHomePage = ref(true)
-const currentUser = await getCurrentUser()
 const { data: bookmarks } = await useAsyncData('bookmarks', async () => { const { data } = await getBookmarks(); return data })
 const route = useRoute()
 const listSurat = await getListSurat()
 const currentSurat = ref({})
+const currentUser = await getCurrentUser()
 const title = ref()
+const subtitle = ref()
 watchEffect(() => {
     if (route.params.id) {
         isHomePage.value = false
         currentSurat.value = listSurat.value.find((surat) => surat.nomor === route.params.id)
         title.value = currentSurat.value.nama
+        subtitle.value = `(${currentSurat.value.arti})`
     } else {
         isHomePage.value = true
-        title.value = "E-Quraan"
+        title.value = "Al-Qur'an"
+        subtitle.value= ""
     }
 })
-const addBookmark = async () => {
-    try {
-        const { error } = await supabase
-            .from('bookmarks')
-            .insert(
-                { user_id: currentUser.id, name: name.value },
-            )
-        if (error) { throw error } else { showModal.value = false }
-        refreshNuxtData('bookmarks')
-    } catch (error) {
-        alert(error.error_description || error.message)
-    }
 
+const getSuratName = (nomorSurat) => {
+    const surat = listSurat.value.find(surat => surat.nomor === nomorSurat)
+    return surat?.nama
 }
 
-function toggleModal() {
-    showModal.value = !showModal.value;
-}
+const bookmarks2 = computed(() => {
+      return bookmarks.value.map(bookmark => ({
+        ...bookmark,
+        suratName: getSuratName(bookmark.surat)
+      }));
+    });
 
 const handleLogout = async () => {
     try {
@@ -128,12 +114,16 @@ const handleLogout = async () => {
 
 const handleClickBookmark = (surat, ayat) => {
     if (surat) {
-        navigateTo({path: `/surah/${surat}`, query: {ayat: ayat}})
+        navigateTo({ path: `/surah/${surat}`, query: { ayat: ayat } })
     }
 }
 
 const handleClickHome = () => {
     navigateTo("/")
+}
+
+const handleBookmark = () => {
+    navigateTo("/bookmark")
 }
 </script>
 

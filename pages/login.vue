@@ -8,7 +8,7 @@
 
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
             <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                <form class="space-y-6" @submit.prevent="loginWithEmail">
+                <!-- <form class="space-y-6" @submit.prevent="loginWithEmail">
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">
                             Email address
@@ -52,14 +52,17 @@
                             Log in
                         </button>
                     </div>
-                </form>
+                </form> -->
                 <div>
                     <button @click="handleLogin" type="submit"
                         class="w-full mt-4 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Log in wigh Google
+                        <span>
+                            <font-awesome-icon icon="fa-brands fa-google"/>
+                        </span>
                     </button>
                 </div>
-                <button class="transition duration-200 mx-5 px-5 py-4 cursor-pointer font-normal text-sm rounded-lg text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-200 focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 ring-inset">
+                <!-- <button
+                    class="transition duration-200 mx-5 px-5 py-4 cursor-pointer font-normal text-sm rounded-lg text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-200 focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 ring-inset">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                         class="w-4 h-4 inline-block align-text-top">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -67,13 +70,13 @@
                     </svg>
                     <span class="inline-block ml-1">Do not have an account? Sign up</span>
                 </button>
-
+ -->
 
 
             </div>
         </div>
     </div>
-</template>>
+</template>
 <script setup>
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()

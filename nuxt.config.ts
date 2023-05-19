@@ -4,4 +4,7 @@ export default defineNuxtConfig({
         '@nuxtjs/supabase',
         '@nuxtjs/tailwindcss'
     ],
+    css: [
+        '@fortawesome/fontawesome-svg-core/styles.css'
+      ]
 })
